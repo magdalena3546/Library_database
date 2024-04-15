@@ -48,3 +48,28 @@ CREATE TABLE Books (
     FOREIGN KEY (GenreID) REFERENCES genres(GenreID),
     FOREIGN KEY (PublisherID) REFERENCES publishers(PublisherID)
 );
+
+CREATE TABLE Borrowings  (
+    BorrowingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    BookID INT NOT NULL,
+    UserID INT NOT NULL,
+    BorrowDate DATE NOT NULL,
+    ReturnDate DATE DEFAULT NULL,
+    ExpectedReturnDate DATE NOT NULL,
+    FOREIGN KEY (BookID) REFERENCES Books(BookID),
+    FOREIGN KEY (UserID) REFERENCES Readers(ReaderID)
+);
+
+-- create trigger for set return date;
+DELIMITER //
+CREATE TRIGGER set_expected_return_date
+BEFORE INSERT ON Borrowings
+FOR EACH ROW
+	BEGIN 
+		SET NEW.ExpectedReturnDate = DATE_ADD(NEW.BorrowDate, INTERVAL 28 DAY);
+	END
+//
+DELIMITER ;
+
+INSERT INTO Borrowings (BookID, UserID, BorrowDate)
+VALUES (1, 1, '2024-04-15');
