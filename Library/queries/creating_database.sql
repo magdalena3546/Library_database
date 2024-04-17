@@ -1,8 +1,8 @@
--- tworzenie bazy danych
+-- create database library
 CREATE DATABASE Library;
 
 USE Library;
--- tworzenie tabeli zawierającej czytelników
+-- create table readers
 CREATE TABLE Readers (
 	ReaderID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     FirstName VARCHAR(250) NOT NULL,
@@ -17,18 +17,18 @@ CREATE TABLE Readers (
     Email VARCHAR(250) NOT NULL,
     DateAdded TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- tworzenie tabeli zawierającej autorów
+-- create table authors
 CREATE TABLE Authors (
 	AuthorID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     FirstName VARCHAR(250) NOT NULL,
     LastName VARCHAR(250) NOT NULL
 );
--- tworzenie tabeli zawierającej gatunki literackie
+-- -- create table genres
 CREATE TABLE Genres (
 	GenreID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     GenreName VARCHAR(250) NOT NULL
 );
--- tworzenie tabeli zawierającej wydawnictwa
+-- create table publishers
 CREATE TABLE Publishers (
 	PublisherID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     PublisherName VARCHAR(250) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE Publishers (
     Phone VARCHAR(20),
     Email VARCHAR(250)
 );
--- tworzenie tabeli zawierającej książki
+-- create table books
 CREATE TABLE Books (
 	BookID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Title VARCHAR(250) NOT NULL,
@@ -48,14 +48,15 @@ CREATE TABLE Books (
     FOREIGN KEY (GenreID) REFERENCES genres(GenreID),
     FOREIGN KEY (PublisherID) REFERENCES publishers(PublisherID)
 );
-
+-- create table borrowings
 CREATE TABLE Borrowings  (
     BorrowingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     BookID INT NOT NULL,
     UserID INT NOT NULL,
-    BorrowDate DATE NOT NULL,
+	BorrowDate DATE NOT NULL,
     ReturnDate DATE DEFAULT NULL,
     ExpectedReturnDate DATE NOT NULL,
+    Delay INT DEFAULT 0,
     FOREIGN KEY (BookID) REFERENCES Books(BookID),
     FOREIGN KEY (UserID) REFERENCES Readers(ReaderID)
 );
@@ -71,5 +72,11 @@ FOR EACH ROW
 //
 DELIMITER ;
 
-INSERT INTO Borrowings (BookID, UserID, BorrowDate)
-VALUES (1, 1, '2024-04-15');
+-- create penalties table
+CREATE TABLE Penalties (
+	PenaltyID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    BorrowingID INT NOT NULL,
+    Amount DECIMAL(10, 2) NOT NULL,
+    Settled BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY(BorrowingID) REFERENCES Borrowings(BorrowingID)
+);
